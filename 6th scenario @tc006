@@ -1,0 +1,81 @@
+import { Given, When, Then } from '@cucumber/cucumber';
+import { expect } from '@playwright/test';
+import { pageFixture } from './hooks/browserContextFIxture';
+
+// 6th scenario @tc006
+
+Given(
+  'User navigates to the facility with allocated borrower {string}',
+  async function (borrowerName: string) {
+    const page = pageFixture.page;
+
+    await page.getByText(borrowerName).click();
+    await expect(page.locator('.facility-view')).toBeVisible();
+  }
+);
+
+Given('The facility amount is ${int}', async function (amount: number) {
+  const page = pageFixture.page;
+  const facilityAmount = await page.locator('.facility-amount').textContent();
+
+  const displayedAmount = (facilityAmount ?? '').replace(/\D/g, '');
+  expect(displayedAmount).toBe(amount.toString());
+});
+
+When(
+  'User enters invalid amount ${int} in the limit field',
+  async function (amount: number) {
+    const page = pageFixture.page;
+    const limitField = page.locator('input[name^="limit-"]');
+
+    await limitField.fill(amount.toString());
+  }
+);
+
+Then(
+  'The facility view shows {string}',
+  async function (expectedText: string) {
+    const page = pageFixture.page;
+
+    await expect(page.locator('.facility-borrower'))
+      .toContainText(expectedText);
+  }
+);
+
+Then('The limit field shows "${int}"', async function (amount: number) {
+  const page = pageFixture.page;
+  const limitField = page.locator('input[name^="limit-"]');
+
+  await expect(limitField).toHaveValue(amount.toString());
+});
+
+When('User moves focus away from the limit field', async function () {
+  const page = pageFixture.page;
+
+  await page.locator('input[name^="limit-"]').press('Tab');
+});
+
+Then('A validation error message is displayed', async function () {
+  const page = pageFixture.page;
+
+  await expect(page.locator('.validation-error')).toBeVisible();
+});
+
+When('User corrects the limit to ${int}', async function (amount: number) {
+  const page = pageFixture.page;
+  const limitField = page.locator('input[name^="limit-"]');
+
+  await limitField.fill(amount.toString());
+});
+
+When('User clicks the save button', async function () {
+  const page = pageFixture.page;
+
+  await page.getByRole('button', { name: 'Save' }).click();
+});
+
+Then('The validation error message disappears', async function () {
+  const page = pageFixture.page;
+
+  await expect(page.locator('.validation-error')).toHaveCount(0);
+});
