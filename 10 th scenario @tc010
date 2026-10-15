@@ -1,5 +1,5 @@
-
- // Scenario 10 - @TC10
+```typescript
+// Scenario 10 - @TC10
 
 When('User navigates to deal with one borrower and two facilities', async function () {
   await page.goto('/deal/one-borrower-two-facilities');
@@ -7,15 +7,15 @@ When('User navigates to deal with one borrower and two facilities', async functi
 
 Then(
   'Borrower becomes {string} with Facilities {string} having amount {string} and {string} having amount {string}',
-  async function (borrower, facilityX, amountX, facilityY, amountY) {
+  async function (borrower, facility1, amount1, facility2, amount2) {
     const borrowerName = await page.locator('.borrower-name').textContent();
     expect(borrowerName?.trim()).toBe(borrower);
 
-    const facilityXAmount = await page.locator(`#${facilityX}-amount`).textContent();
-    const facilityYAmount = await page.locator(`#${facilityY}-amount`).textContent();
+    const facility1Amount = await page.locator(`#${facility1}-amount`).textContent();
+    const facility2Amount = await page.locator(`#${facility2}-amount`).textContent();
 
-    expect(facilityXAmount?.trim()).toBe(amountX);
-    expect(facilityYAmount?.trim()).toBe(amountY);
+    expect(facility1Amount?.trim()).toBe(amount1);
+    expect(facility2Amount?.trim()).toBe(amount2);
   }
 );
 
@@ -23,7 +23,7 @@ Then('The deal page is loaded', async function () {
   await expect(page.locator('.deal-page')).toBeVisible();
 });
 
-When('user selects {string} and allocates it as {string}', async function (facility, borrower) {
+When('User selects {string} and allocates it as {string}', async function (facility, borrower) {
   await page.click(`text=${facility}`);
   await page.click(`button:has-text("Allocate ${borrower}")`);
 });
@@ -33,15 +33,21 @@ Then('{string} is successfully allocated to {string}', async function (borrower,
   expect(allocation).toContain(borrower);
 });
 
-When('User set the limit for {string} for {string} as {string}', async function (borrower, facility, limit) {
-  await page.fill(`#${facility}-${borrower}-limit`, limit);
-  await page.click(`#${facility}-save`);
-});
+When(
+  'User sets the limit for {string} for {string} as {string}',
+  async function (borrower, facility, limit) {
+    await page.fill(`#${facility}-${borrower}-limit`, limit);
+    await page.click(`#${facility}-save`);
+  }
+);
 
-Then('The limit is set to {string} for {string} in {string}', async function (limit, borrower, facility) {
-  const savedLimit = await page.locator(`#${facility}-${borrower}-limit`).inputValue();
-  expect(savedLimit).toBe(limit);
-});
+Then(
+  'The limit is set to {string} for {string} in {string}',
+  async function (limit, borrower, facility) {
+    const savedLimit = await page.locator(`#${facility}-${borrower}-limit`).inputValue();
+    expect(savedLimit).toBe(limit);
+  }
+);
 
 Then('Changes are saved', async function () {
   await expect(page.locator('.save-success')).toBeVisible();
@@ -51,26 +57,38 @@ When('User navigates to {string}', async function (facility) {
   await page.click(`text=${facility}`);
 });
 
-Then('The {string} details are displayed {string} is not yet allocated', async function (facility, borrower) {
-  await expect(page.locator(`#${facility}-details`)).toBeVisible();
+Then(
+  'The {string} details are displayed and {string} is not yet allocated',
+  async function (facility, borrower) {
+    await expect(page.locator(`#${facility}-details`)).toBeVisible();
 
-  const allocation = await page.locator(`#${facility}-allocation`).textContent();
-  expect(allocation).not.toContain(borrower);
-});
+    const allocation = await page.locator(`#${facility}-allocation`).textContent();
+    expect(allocation).not.toContain(borrower);
+  }
+);
 
 When('User allocates {string} to {string}', async function (borrower, facility) {
   await page.click(`button:has-text("Allocate ${borrower}")`);
 });
 
-Then('The limit field for this borrower is empty or zero', async function () {
-  const limitValue = await page.locator('.borrower-limit').inputValue();
-  expect(limitValue === '' || limitValue === '0').toBeTruthy();
-});
+Then(
+  'The limit field for {string} in {string} is empty or zero',
+  async function (borrower, facility) {
+    const limitValue = await page
+      .locator(`#${facility}-${borrower}-limit`)
+      .inputValue();
 
-When('User set the limit as {string} for {string} in {string}', async function (limit, borrower, facility) {
-  await page.fill(`#${facility}-${borrower}-limit`, limit);
-  await page.click(`#${facility}-save`);
-});
+    expect(limitValue === '' || limitValue === '0').toBeTruthy();
+  }
+);
+
+When(
+  'User sets the limit as {string} for {string} in {string}',
+  async function (limit, borrower, facility) {
+    await page.fill(`#${facility}-${borrower}-limit`, limit);
+    await page.click(`#${facility}-save`);
+  }
+);
 
 When('User navigates back to {string}', async function (facility) {
   await page.click(`text=${facility}`);
@@ -80,7 +98,14 @@ Then('The view for {string} is displayed', async function (facility) {
   await expect(page.locator(`#${facility}-details`)).toBeVisible();
 });
 
-Then('The limit for {string} is shown as {string}', async function (borrower, limit) {
-  const savedLimit = await page.locator(`.limit-display:has-text("${borrower}")`).textContent();
-  expect(savedLimit).toContain(limit);
-});
+Then(
+  'The limit for {string} is shown as {string}',
+  async function (borrower, limit) {
+    const savedLimit = await page
+      .locator(`.limit-display:has-text("${borrower}")`)
+      .textContent();
+
+    expect(savedLimit).toContain(limit);
+  }
+);
+```
