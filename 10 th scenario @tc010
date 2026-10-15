@@ -1,4 +1,4 @@
-```typescript
+
 // Scenario 10 - @TC10
 
 When('User navigates to deal with one borrower and two facilities', async function () {
@@ -108,4 +108,3 @@ Then(
     expect(savedLimit).toContain(limit);
   }
 );
-```
