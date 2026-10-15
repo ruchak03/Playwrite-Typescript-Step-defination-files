@@ -66,20 +66,25 @@ Examples:
 
 
 
-    @Test @TC11
-    Scenario: Navigate to facility with several allocated borrowers
-       When User navigates to a facility with several allocated borrowers
-       Then The facility shows 4 borrower tags
-       And The allocated borrower count is "4"
-       When User clicks "Select" button or ctrl+click
-       Then Two borrowers are selected
-       And Both borrowers are highlighted or checked indicating they are selected
-       When User selects two borrowers "Delete" or "Remove" button becomes active
-       And User clicks "Delete" or "Remove" button
-       Then A confirmation prompt may appear
-       When User confirms the deletion
-       Then The two selected borrowers are removed from the facility
-       And Tags for remaining two borrowers are still visible
-       And The allocated borrower count is updates from "4" to "2" 
+@Test @TC11
+Scenario Outline: Navigate to facility with several allocated borrowers
+  When User navigates to a facility with several allocated borrowers
+  Then The facility shows <InitialBorrowerCount> borrower tags
+  And The allocated borrower count is "<InitialBorrowerCount>"
+  When User clicks "<SelectionMethod>" to select borrowers
+  Then <SelectedBorrowerCount> borrowers are selected
+  And Both borrowers are highlighted or checked indicating they are selected
+  When User selects two borrowers, the "<DeleteButton>" button becomes active
+  And User clicks the "<DeleteButton>" button
+  Then A confirmation prompt may appear
+  When User confirms the deletion
+  Then The two selected borrowers are removed from the facility
+  And Tags for remaining <RemainingBorrowerCount> borrowers are still visible
+  And The allocated borrower count updates from "<InitialBorrowerCount>" to "<RemainingBorrowerCount>"
+
+Examples:
+  | InitialBorrowerCount | SelectionMethod | SelectedBorrowerCount | DeleteButton | RemainingBorrowerCount |
+  | 4                    | Select          | 2                     | Delete       | 2                       |
+
 
 
