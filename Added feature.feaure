@@ -15,45 +15,54 @@
 
 
 @Test @TC9
-  Scenario: Navigate to a deal with defined primary borrower
-       When User navigates to a deal with defined primary borrower
-       Then Deal Primary Borrower becomes "DealPrime" and Deal Additional Borrower becomes "DealSecond"
-       And The deal overview page correctly shows "DealPrime" as the primary borrower for the entire deal
-       When User selects "Facility J" and allocates both borrowers
-       Then "DealPrime" is the default primary borrower for "Facility J"
-       When User changes the primary borrower for "Facility J" to "DealSecond"
-       Then The new facility primary borrower becomes "DealSecond"
-       And On "Facility J" screen, "DealSecond" is shown as the primary borrower
-       When User saves the facility changes
-       Then The changes are saved successfully
-       When User navigates back to the main deal overview page
-       Then The deal overview page shows "DealPrime" as the primary borrower for the deal
-       And The changes made at the facility level have not propagated to the deal level
+Scenario Outline: Navigate to a deal with defined primary borrower
+  When User navigates to a deal with defined primary borrower
+  Then Deal Primary Borrower becomes "<DealPrimaryBorrower>" and Deal Additional Borrower becomes "<DealAdditionalBorrower>"
+  And The deal overview page correctly shows "<DealPrimaryBorrower>" as the primary borrower for the entire deal
+  When User selects "<Facility>" and allocates both borrowers
+  Then "<DealPrimaryBorrower>" is the default primary borrower for "<Facility>"
+  When User changes the primary borrower for "<Facility>" to "<NewFacilityPrimaryBorrower>"
+  Then The new facility primary borrower becomes "<NewFacilityPrimaryBorrower>"
+  And On "<Facility>" screen, "<NewFacilityPrimaryBorrower>" is shown as the primary borrower
+  When User saves the facility changes
+  Then The changes are saved successfully
+  When User navigates back to the main deal overview page
+  Then The deal overview page shows "<DealPrimaryBorrower>" as the primary borrower for the deal
+  And The changes made at the facility level have not propagated to the deal level
+
+Examples:
+  | DealPrimaryBorrower | DealAdditionalBorrower | Facility   | NewFacilityPrimaryBorrower |
+  | DealPrime           | DealSecond             | Facility J | DealSecond                 |
 
 
  
 
+
 @Test @TC10
-    Scenario: Navigate to deal with one borrower and two facilities
-        When User navigates to deal with one borrower and two facilities
-        Then Borrower becomes "Universal Borrower" with Facilities "Facility X" having amount "$500k" and "Facility Y" having amount "$2M"
-        And The deal page is loaded
-        When User selects "Facility X" and allocates it as "Universal Borrower"
-        Then "Universal Borrower" is successfully allocated to "Facility X"
-        When User sets the limit for "Universal Borrower" for "Facility X" as "$300000"
-        Then The limit is set to "$300000" for "Universal Borrower" in "Facility X"
-        And Changes are saved
-        When User navigates to "Facility Y"
-        Then The "Facility Y" details are displayed and "Universal Borrower" is not yet allocated
-        When User allocates "Universal Borrower" to "Facility Y"
-        Then "Universal Borrower" is successfully allocated to "Facility Y"
-        And The limit field for "Universal Borrower" in "Facility Y" is empty or zero
-        When User sets the limit as "$1000000" for "Universal Borrower" in "Facility Y"
-        Then The limit is set to "$1000000" for "Universal Borrower" in "Facility Y"
-        Changes are saved
-        When User navigates back to "Facility X"
-        Then The view for "Facility X" is displayed
-        And The limit for "Universal Borrower" is shown as "$300000"
+Scenario Outline: Navigate to deal with one borrower and two facilities
+  When User navigates to deal with one borrower and two facilities
+  Then Borrower becomes "<Borrower>" with Facilities "<Facility1>" having amount "<Facility1Amount>" and "<Facility2>" having amount "<Facility2Amount>"
+  And The deal page is loaded
+  When User selects "<Facility1>" and allocates it as "<Borrower>"
+  Then "<Borrower>" is successfully allocated to "<Facility1>"
+  When User sets the limit for "<Borrower>" for "<Facility1>" as "<Facility1Limit>"
+  Then The limit is set to "<Facility1Limit>" for "<Borrower>" in "<Facility1>"
+  And Changes are saved
+  When User navigates to "<Facility2>"
+  Then The "<Facility2>" details are displayed and "<Borrower>" is not yet allocated
+  When User allocates "<Borrower>" to "<Facility2>"
+  Then "<Borrower>" is successfully allocated to "<Facility2>"
+  And The limit field for "<Borrower>" in "<Facility2>" is empty or zero
+  When User sets the limit as "<Facility2Limit>" for "<Borrower>" in "<Facility2>"
+  Then The limit is set to "<Facility2Limit>" for "<Borrower>" in "<Facility2>"
+  And Changes are saved
+  When User navigates back to "<Facility1>"
+  Then The view for "<Facility1>" is displayed
+  And The limit for "<Borrower>" is shown as "<Facility1Limit>"
+
+Examples:
+  | Borrower           | Facility1   | Facility1Amount | Facility1Limit | Facility2   | Facility2Amount | Facility2Limit |
+  | Universal Borrower | Facility X  | $500k           | $300000        | Facility Y  | $2M             | $1000000       |
 
 
 
