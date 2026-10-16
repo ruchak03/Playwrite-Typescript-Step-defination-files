@@ -1,0 +1,65 @@
+@Test @TC6
+Scenario: Validate borrower limit for a facility with an allocated borrower
+  When user clicks on the edit icon for the "Facility 4" with an allocated borrower
+  Then user clicks on overview tab and scrolls down to Facility Global Amount having value "$1000000"
+  When User enters invalid amount "$1500000" into the limit field
+  Then The value "$1500000" is displayed in the input field
+  When User moves focus away from the limit field
+  Then A validation error message is displayed
+  When User corrects the limit to "$900000"
+  And User clicks on save button
+  Then The validation error message disappears
+
+@Test @TC9
+Scenario: Navigate to a deal with defined primary borrower
+  When User navigates to a deal with defined primary borrower
+  Then Deal Primary Borrower becomes "DealPrime" and Deal Additional Borrower becomes "DealSecond"
+  And The deal overview page correctly shows "DealPrime" as the primary borrower for the entire deal
+  When User selects "Facility J" and allocates both borrowers
+  Then "DealPrime" is the default primary borrower for "Facility J"
+  When User changes the primary borrower for "Facility J" to "DealSecond"
+  Then The new facility primary borrower becomes "DealSecond"
+  And On "Facility J" screen, "DealSecond" is shown as the primary borrower
+  When User saves the facility changes
+  Then The changes are saved successfully
+  When User navigates back to the main deal overview page
+  Then The deal overview page shows "DealPrime" as the primary borrower for the deal
+  And The changes made at the facility level have not propagated to the deal level
+
+@Test @TC10
+Scenario: Navigate to deal with one borrower and two facilities
+  When User navigates to deal with one borrower and two facilities
+  Then Borrower becomes "Universal Borrower" with Facilities "Facility X" having amount "$500k" and "Facility Y" having amount "$2M"
+  And The deal page is loaded
+  When User selects "Facility X" and allocates it as "Universal Borrower"
+  Then "Universal Borrower" is successfully allocated to "Facility X"
+  When User sets the limit for "Universal Borrower" for "Facility X" as "$300000"
+  Then The limit is set to "$300000" for "Universal Borrower" in "Facility X"
+  And Changes are saved
+  When User navigates to "Facility Y"
+  Then The "Facility Y" details are displayed and "Universal Borrower" is not yet allocated
+  When User allocates "Universal Borrower" to "Facility Y"
+  Then "Universal Borrower" is successfully allocated to "Facility Y"
+  And The limit field for "Universal Borrower" in "Facility Y" is empty or zero
+  When User sets the limit as "$1000000" for "Universal Borrower" in "Facility Y"
+  Then The limit is set to "$1000000" for "Universal Borrower" in "Facility Y"
+  And Changes are saved
+  When User navigates back to "Facility X"
+  Then The view for "Facility X" is displayed
+  And The limit for "Universal Borrower" is shown as "$300000"
+
+@Test @TC11
+Scenario: Navigate to facility with several allocated borrowers
+  When User navigates to a facility with several allocated borrowers
+  Then The facility shows 4 borrower tags
+  And The allocated borrower count is "4"
+  When User clicks "Select" to select borrowers
+  Then 2 borrowers are selected
+  And Both borrowers are highlighted or checked indicating they are selected
+  When User selects two borrowers, the "Delete" button becomes active
+  And User clicks the "Delete" button
+  Then A confirmation prompt may appear
+  When User confirms the deletion
+  Then The two selected borrowers are removed from the facility
+  And Tags for remaining 2 borrowers are still visible
+  And The allocated borrower count updates from "4" to "2"  
