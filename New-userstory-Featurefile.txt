@@ -1,0 +1,28 @@
+
+@regression @TC_Event_Initiation
+Scenario: Verify Event #1 initiation controls for a newly initiated deal
+  When User navigates to a deal with status "New, awaiting Event #1"
+  Then User lands on the "Deal Overview" tab
+  And The modification banner displays the Event #1 Legal Doc-Driven workflow message
+  And The "Submit to Checker" button is visible
+  And The "Submit to Checker" button is disabled
+  And The "Initiate Event" button is visible
+  And The "Initiate Event" button is disabled
+
+
+
+@regression @TC_Event_History
+Scenario: Verify deal information and Event #1 details for a deal in progress
+  When User navigates to a deal where Event #1 is "In Progress"
+  Then User lands on the "Deal Overview" tab
+  And The "Deal Summary" component is displayed
+  And The "Deal Information" section displays the Deal ID, Deal Type, and Legal Entity from the WLO Kickoff
+  And The Bank Role field displays "-"
+  And The Effective Date field displays "-"
+  And The Governing Law field displays "-"
+  And The Administrative Agent field displays "-"
+  And The "Event History" component is displayed
+  And The Event History table contains an entry for "Event #1"
+  And The Event Type for "Event #1" is "Legal (Doc - Driven)"
+  And The Event Sub Type for "Event #1" is "New Credit Agreement"
+
