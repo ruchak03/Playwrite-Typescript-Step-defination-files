@@ -1,0 +1,69 @@
+
+import { When, Then } from '@cucumber/cucumber';
+import { expect } from '@playwright/test';
+import { pageFixture } from '../support/pageFixture';
+
+// TC_Event_Initiation
+
+When(
+  'User navigates to a deal with status {string}',
+  async function (status: string) {
+    const page = pageFixture.page;
+
+    // TODO: Replace with the existing deal navigation
+    // method or the correct deal row locator.
+    const deal = page.getByText(status, { exact: false }).first();
+
+    await expect(deal).toBeVisible();
+    await deal.click();
+  }
+);
+
+// Shared step used by both feature files.
+// Define this step only once across the project.
+Then(
+  'User lands on the {string} tab',
+  async function (tabName: string) {
+    const page = pageFixture.page;
+
+    await expect(
+      page.getByText(tabName, { exact: true }).first()
+    ).toBeVisible();
+  }
+);
+
+Then(
+  'The modification banner displays the Event #1 Legal Doc-Driven workflow message',
+  async function () {
+    const page = pageFixture.page;
+
+    // TODO: Confirm the exact banner text from the application.
+    await expect(
+      page.getByText(
+        /You are currently modifying Event #1.*New Credit Agreement/i
+      )
+    ).toBeVisible();
+  }
+);
+
+Then(
+  'The {string} button is visible',
+  async function (buttonName: string) {
+    const page = pageFixture.page;
+
+    await expect(
+      page.getByRole('button', { name: buttonName })
+    ).toBeVisible();
+  }
+);
+
+Then(
+  'The {string} button is disabled',
+  async function (buttonName: string) {
+    const page = pageFixture.page;
+
+    await expect(
+      page.getByRole('button', { name: buttonName })
+    ).toBeDisabled();
+  }
+);
