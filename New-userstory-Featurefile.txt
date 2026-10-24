@@ -1,0 +1,96 @@
+
+@regression @C176436W-48642TC_001
+Scenario: Verify Event #1 initiation controls for a new deal
+  When User navigates to a deal with status "New, awaiting Event #1"
+  Then User lands on the "Deal Overview" tab
+  And The Event #1 Legal Doc-Driven modification banner is displayed
+  And The "Submit to Checker" button is disabled
+  And The "Initiate Event" button is disabled
+
+
+@regression @C176436W-48642TC_002
+Scenario: Verify deal information and Event #1 details for an in-progress deal
+  When User navigates to a deal where Event #1 is "In Progress"
+  Then User lands on the "Deal Overview" tab
+  And The Deal Summary and Event History components are displayed
+  And The Deal ID, Deal Type, and Legal Entity match the WLO Kickoff
+  And The Bank Role, Effective Date, Governing Law, and Administrative Agent fields display "-"
+  And Event #1 has type "Legal (Doc - Driven)" and subtype "New Credit Agreement"
+
+
+@regression @C176436W-48642TC_003
+Scenario: Verify Deal Description and Deal Rationale are read-only
+  When User navigates to a deal where Event #1 is "In Progress"
+  Then User lands on the "Deal Overview" tab
+  And The "Deal Summary" section is displayed
+  And The "Deal Description" field is read-only
+  And The "Deal Rationale" field is read-only
+
+
+@regression @C176436W-48642TC_004
+Scenario: Verify Event #1 submission is enabled after saving valid details
+  When User navigates to a deal where Event #1 is "In Progress"
+  Then User lands on the "Deal Overview" tab
+  And The "Submit to Checker" button is disabled
+  When User navigates to the "Deal Details" tab
+  And User enters valid event details
+    | Bank Role            | Agent        |
+    | Effective Date       | Current Date |
+    | Governing Law        | New York     |
+    | Administrative Agent | CITI         |
+  And User saves the changes
+  When User navigates back to the "Deal Overview" tab
+  Then The "Submit to Checker" button is enabled
+  And The "Initiate Event" button is disabled
+
+
+@regression @C176436W-48642TC_005
+Scenario: Verify Event #1 approval and updated deal information
+  When User navigates to a deal where Event #1 is "Pending Approval"
+  And User logs in as a WLO Operations user with role "Checker"
+  And User approves Event #1 for the same deal
+  Then The Event #1 status changes to "Approved" or "Complete"
+  When User logs in as a WLO Operations user with role "Maker"
+  And User navigates to the same deal
+  Then User lands on the "Deal Overview" tab
+  And The Deal Information fields display the saved Event #1 values
+    | Field                | Expected Value |
+    | Bank Role            | Agent          |
+    | Effective Date       | Current Date   |
+    | Governing Law        | New York       |
+    | Administrative Agent | CITI           |
+  And The Event History shows Event #1 with status "Approved" or "Complete"
+
+
+@regression @C176436W-48642TC_006
+Scenario: Verify Initiate Event is enabled after Event #1 approval
+  When User logs in as a WLO Operations user with role "Maker"
+  And User navigates to a deal where Event #1 is "Approved" or "Complete"
+  Then User lands on the "Deal Overview" tab
+  And The "Initiate Event" button is visible
+  And The "Initiate Event" button is enabled
+
+
+@regression @C176436W-48642TC_007
+Scenario: Verify Event #2 initiation and Event History
+  When User logs in as a WLO Operations user with role "Maker"
+  And User navigates to a deal where Event #1 is "Approved" or "Complete"
+  And User clicks the "Initiate Event" button
+  Then User lands on the "Deal Overview" tab
+  And The "Event History" table contains two entries
+  And Event #2 is the first row with status "In Progress"
+  And Event #1 is the second row with status "Approved" or "Complete"
+
+
+@regression @C176436W-48642TC_008
+Scenario: Verify Governing Law update after Event #2 approval
+  When User navigates to a deal where Event #2 is "In Progress"
+  And User updates the "Governing Law" field to "Delaware" on the "Deal Details" tab
+  And User saves the changes and submits Event #2 to the Checker
+  And User logs in as a WLO Operations user with role "Checker"
+  And User approves Event #2 for the same deal
+  Then Event #2 status changes to "Complete" or "Approved"
+  When User logs in as a WLO Operations user with role "Maker"
+  And User navigates to the same deal's "Deal Overview" tab
+  Then The "Governing Law" field displays "Delaware"
+

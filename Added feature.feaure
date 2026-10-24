@@ -1,0 +1,90 @@
+@Test @TC5
+    Scenario: Navigate to a facility with an allocated borrower
+        When User navigates to a facility with an allocated borrower "Borrower Z"
+        And Facility amount is $1000000
+        Then The facility view shows "Borrower Z" allocated.
+        Then An editable "Limit" field is available for "Borrower Z"
+        When User enters valid amount $500000 in the "Limit" field for "Borrower Z"
+        Then The value "500000" is accepted into the input field
+        And No validation errors appear.
+        When User save the facility changes
+        Then The changes are saved successfully
+        When User navigate away from facility and then back to it
+        Then The "Limit" field for "Borrower Z" correctly displays the saved value of "500000"
+
+
+
+@Test @TC9
+Scenario Outline: Navigate to a deal with defined primary borrower
+  When User navigates to a deal with defined primary borrower
+  Then Deal Primary Borrower becomes "<DealPrimaryBorrower>" and Deal Additional Borrower becomes "<DealAdditionalBorrower>"
+  And The deal overview page correctly shows "<DealPrimaryBorrower>" as the primary borrower for the entire deal
+  When User selects "<Facility>" and allocates both borrowers
+  Then "<DealPrimaryBorrower>" is the default primary borrower for "<Facility>"
+  When User changes the primary borrower for "<Facility>" to "<NewFacilityPrimaryBorrower>"
+  Then The new facility primary borrower becomes "<NewFacilityPrimaryBorrower>"
+  And On "<Facility>" screen, "<NewFacilityPrimaryBorrower>" is shown as the primary borrower
+  When User saves the facility changes
+  Then The changes are saved successfully
+  When User navigates back to the main deal overview page
+  Then The deal overview page shows "<DealPrimaryBorrower>" as the primary borrower for the deal
+  And The changes made at the facility level have not propagated to the deal level
+
+Examples:
+  | DealPrimaryBorrower | DealAdditionalBorrower | Facility   | NewFacilityPrimaryBorrower |
+  | DealPrime           | DealSecond             | Facility J | DealSecond                 |
+
+
+ 
+
+
+@Test @TC10
+Scenario Outline: Navigate to deal with one borrower and two facilities
+  When User navigates to deal with one borrower and two facilities
+  Then Borrower becomes "<Borrower>" with Facilities "<Facility1>" having amount "<Facility1Amount>" and "<Facility2>" having amount "<Facility2Amount>"
+  And The deal page is loaded
+  When User selects "<Facility1>" and allocates it as "<Borrower>"
+  Then "<Borrower>" is successfully allocated to "<Facility1>"
+  When User sets the limit for "<Borrower>" for "<Facility1>" as "<Facility1Limit>"
+  Then The limit is set to "<Facility1Limit>" for "<Borrower>" in "<Facility1>"
+  And Changes are saved
+  When User navigates to "<Facility2>"
+  Then The "<Facility2>" details are displayed and "<Borrower>" is not yet allocated
+  When User allocates "<Borrower>" to "<Facility2>"
+  Then "<Borrower>" is successfully allocated to "<Facility2>"
+  And The limit field for "<Borrower>" in "<Facility2>" is empty or zero
+  When User sets the limit as "<Facility2Limit>" for "<Borrower>" in "<Facility2>"
+  Then The limit is set to "<Facility2Limit>" for "<Borrower>" in "<Facility2>"
+  And Changes are saved
+  When User navigates back to "<Facility1>"
+  Then The view for "<Facility1>" is displayed
+  And The limit for "<Borrower>" is shown as "<Facility1Limit>"
+
+Examples:
+  | Borrower           | Facility1   | Facility1Amount | Facility1Limit | Facility2   | Facility2Amount | Facility2Limit |
+  | Universal Borrower | Facility X  | $500k           | $300000        | Facility Y  | $2M             | $1000000       |
+
+
+
+@Test @TC11
+Scenario Outline: Navigate to facility with several allocated borrowers
+  When User navigates to a facility with several allocated borrowers
+  Then The facility shows <InitialBorrowerCount> borrower tags
+  And The allocated borrower count is "<InitialBorrowerCount>"
+  When User clicks "<SelectionMethod>" to select borrowers
+  Then <SelectedBorrowerCount> borrowers are selected
+  And Both borrowers are highlighted or checked indicating they are selected
+  When User selects two borrowers, the "<DeleteButton>" button becomes active
+  And User clicks the "<DeleteButton>" button
+  Then A confirmation prompt may appear
+  When User confirms the deletion
+  Then The two selected borrowers are removed from the facility
+  And Tags for remaining <RemainingBorrowerCount> borrowers are still visible
+  And The allocated borrower count updates from "<InitialBorrowerCount>" to "<RemainingBorrowerCount>"
+
+Examples:
+  | InitialBorrowerCount | SelectionMethod | SelectedBorrowerCount | DeleteButton | RemainingBorrowerCount |
+  | 4                    | Select          | 2                     | Delete       | 2                       |
+
+
+
