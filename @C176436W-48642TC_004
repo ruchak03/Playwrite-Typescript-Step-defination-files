@@ -1,0 +1,62 @@
+import { When, Then } from '@cucumber/cucumber';
+import { expect } from '@playwright/test';
+import { DataTable } from '@cucumber/cucumber';
+import { pageFixture } from '../support/pageFixture';
+
+When(
+  'User enters valid event details',
+  async function (dataTable: DataTable) {
+    const page = pageFixture.page;
+    const details = dataTable.rowsHash();
+
+    for (const [field, value] of Object.entries(details)) {
+      const locator = page.getByLabel(field, { exact: true });
+
+      await expect(locator).toBeVisible();
+
+      if (value === 'Current Date') {
+        const today = new Date();
+        const currentDate = [
+          today.getFullYear(),
+          String(today.getMonth() + 1).padStart(2, '0'),
+          String(today.getDate()).padStart(2, '0'),
+        ].join('-');
+
+        await locator.fill(currentDate);
+      } else {
+        // Assumes these fields are editable text inputs.
+        // Use selectOption() or your existing dropdown method
+        // if the field is a dropdown.
+        await locator.fill(value);
+      }
+    }
+  }
+);
+
+When('User saves the changes', async function () {
+  const page = pageFixture.page;
+
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+});
+
+Then(
+  'The {string} button is enabled',
+  async function (buttonName: string) {
+    const page = pageFixture.page;
+
+    await expect(
+      page.getByRole('button', { name: buttonName, exact: true })
+    ).toBeEnabled();
+  }
+);
+
+Then(
+  'The {string} button is disabled',
+  async function (buttonName: string) {
+    const page = pageFixture.page;
+
+    await expect(
+      page.getByRole('button', { name: buttonName, exact: true })
+    ).toBeDisabled();
+  }
+);

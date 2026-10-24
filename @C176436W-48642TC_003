@@ -1,0 +1,48 @@
+import { When, Then } from '@cucumber/cucumber';
+import { expect } from '@playwright/test';
+import { pageFixture } from '../support/pageFixture';
+
+When(
+  'User navigates to a deal where Event #1 is {string}',
+  async function (status: string) {
+    const page = pageFixture.page;
+
+    // Use your existing navigation steps or page-object method
+    // to open a deal with the specified Event #1 status.
+    await pageFixture.cldcPageFacility.navigateToDealWithEventStatus(status);
+  }
+);
+
+Then(
+  'User lands on the {string} tab',
+  async function (tabName: string) {
+    const page = pageFixture.page;
+
+    await expect(
+      page.getByRole('tab', { name: tabName })
+    ).toHaveAttribute('aria-selected', 'true');
+  }
+);
+
+Then(
+  'The {string} section is displayed',
+  async function (sectionName: string) {
+    const page = pageFixture.page;
+
+    await expect(
+      page.getByText(sectionName, { exact: true }).first()
+    ).toBeVisible();
+  }
+);
+
+Then(
+  'The {string} field is read-only',
+  async function (fieldName: string) {
+    const page = pageFixture.page;
+
+    const field = page.getByLabel(fieldName, { exact: true });
+
+    await expect(field).toBeVisible();
+    await expect(field).toBeEditable({ editable: false });
+  }
+);

@@ -1,0 +1,86 @@
+import { When, Then } from '@cucumber/cucumber';
+import { expect } from '@playwright/test';
+import { DataTable } from '@cucumber/cucumber';
+import { pageFixture } from '../support/pageFixture';
+
+When(
+  'User logs in as a WLO Operations user with role {string}',
+  async function (role: string) {
+    // Replace with your existing login helper or Page Object method.
+    await pageFixture.cldcPageFacility.loginAsRole(role);
+  }
+);
+
+When(
+  'User approves Event #1 for the same deal',
+  async function () {
+    const page = pageFixture.page;
+
+    // Adjust the button name to match your application.
+    await page.getByRole('button', { name: /approve/i }).click();
+  }
+);
+
+Then(
+  'The Event #1 status changes to {string} or {string}',
+  async function (status1: string, status2: string) {
+    const page = pageFixture.page;
+
+    // Replace this locator with the Event #1 status locator in your app.
+    const status = page.locator('[data-testid="event-1-status"]');
+
+    await expect(status).toBeVisible();
+    await expect(status).toHaveText(
+      new RegExp(`^(${status1}|${status2})$`, 'i')
+    );
+  }
+);
+
+When('User navigates to the same deal', async function () {
+  // Reuse your existing deal navigation method.
+  await pageFixture.cldcPageFacility.navigateToSavedDeal();
+});
+
+Then(
+  'The Deal Information fields display the saved Event #1 values',
+  async function (dataTable: DataTable) {
+    const page = pageFixture.page;
+    const rows = dataTable.rowsHash();
+
+    for (const [field, expectedValue] of Object.entries(rows)) {
+      const locator = page.getByLabel(field, { exact: true });
+
+      await expect(locator).toBeVisible();
+
+      if (expectedValue === 'Current Date') {
+        const today = new Date();
+        const expectedDate = [
+          today.getFullYear(),
+          String(today.getMonth() + 1).padStart(2, '0'),
+          String(today.getDate()).padStart(2, '0'),
+        ].join('-');
+
+        // Adjust the format if the application displays dates differently.
+        await expect(locator).toHaveValue(expectedDate);
+      } else {
+        await expect(locator).toHaveValue(expectedValue);
+      }
+    }
+  }
+);
+
+Then(
+  'The Event History shows Event #1 with status {string} or {string}',
+  async function (status1: string, status2: string) {
+    const page = pageFixture.page;
+
+    const eventRow = page
+      .getByRole('row')
+      .filter({ hasText: 'Event #1' });
+
+    await expect(eventRow).toBeVisible();
+    await expect(eventRow).toContainText(
+      new RegExp(`(${status1}|${status2})`, 'i')
+    );
+  }
+);
