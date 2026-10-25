@@ -1,0 +1,64 @@
+
+import { When, Then } from '@cucumber/cucumber';
+import { pageFixture } from '../hooks/pageFixture';
+
+When(
+  'User navigates to a deal where Event #2 is {string}',
+  async function (status: string) {
+    await pageFixture.eventWorkflowPage.navigateToDealWithEventStatus(status);
+  }
+);
+
+When(
+  'User updates the {string} field to {string} on the {string} tab',
+  async function (
+    fieldName: string,
+    value: string,
+    tabName: string
+  ) {
+    await pageFixture.eventWorkflowPage.navigateToTab(tabName);
+    await pageFixture.eventWorkflowPage.updateField(fieldName, value);
+  }
+);
+
+When(
+  'User saves the changes and submits Event #2 to the Checker',
+  async function () {
+    await pageFixture.eventWorkflowPage.saveChanges();
+    await pageFixture.eventWorkflowPage.submitToChecker();
+  }
+);
+
+When(
+  'User approves Event #2 for the same deal',
+  async function () {
+    await pageFixture.eventWorkflowPage.approveEvent2();
+  }
+);
+
+Then(
+  'Event #2 status changes to {string} or {string}',
+  async function (status1: string, status2: string) {
+    await pageFixture.eventWorkflowPage.verifyEvent2Status([
+      status1,
+      status2
+    ]);
+  }
+);
+
+When(
+  "User navigates to the same deal's {string} tab",
+  async function (tabName: string) {
+    await pageFixture.eventWorkflowPage.navigateToTab(tabName);
+  }
+);
+
+Then(
+  'The {string} field displays {string}',
+  async function (fieldName: string, expectedValue: string) {
+    await pageFixture.eventWorkflowPage.verifyFieldValue(
+      fieldName,
+      expectedValue
+    );
+  }
+);
